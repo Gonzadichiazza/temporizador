@@ -11,20 +11,27 @@ const play = new Audio("./sonidos/play.wav")
 const pause = new Audio("./sonidos/pause.mp3")
 const tiempoFinalizado = new Audio("./sonidos/beep.mp3")
 const botonIniciarPausar = document.querySelector("#start-pause"); 
-let segundos = 5; 
+const botonComenzar = document.querySelector("#start-pause span"); 
+const icono = document.querySelector(".app__card-primary-butto-icon"); 
+const tiempoEnPantalla = document.querySelector("#timer"); 
+
+let segundos = 1500; 
 let intervalo= null; 
 
 
 
 enfoque.addEventListener("click", () => {
+    segundos = 1500;
     cambiarContexto("enfoque")
     enfoque.classList.add("active"); 
 });
 corto.addEventListener("click", () => {
+    segundos = 300;
     cambiarContexto("descanso-corto")
     corto.classList.add("active"); 
 });
 largo.addEventListener("click", () => {
+    segundos = 900;
     cambiarContexto("descanso-largo")
     largo.classList.add("active"); 
 });
@@ -42,7 +49,7 @@ checkbox.addEventListener("change" , () => {
 })
 
 function cambiarContexto(contexto){
-    
+    mostrarTiempo();
     html.setAttribute("data-contexto", contexto);
     imagenEnfoque.setAttribute("src",`/imagenes/${contexto}.png`);
 
@@ -82,11 +89,14 @@ function tiempo(){
         reiniciar(); 
         tiempoFinalizado.play();
         alert("finalizado");
+        segundos = 5; 
+        botonComenzar.textContent ="Comenzar"; 
+        cambiarImagen("./imagenes/play_arrow,png")
         return
     }
     
     segundos -= 1; 
-    console.log(segundos)
+    mostrarTiempo();
 }
 
 const iniciarPausar = () => {
@@ -94,14 +104,30 @@ const iniciarPausar = () => {
         pause.play()
         clearInterval(intervalo);
         intervalo = null;
+        cambiarImagen("./imagenes/play_arrow.png")
+        botonComenzar.textContent ="Reiniciar"; 
     } else {
         play.play()
         intervalo = setInterval(tiempo, 1000);
+        cambiarImagen("./imagenes/pause.png")
+        botonComenzar.textContent ="Pausar"; 
     }
 }
 
 function reiniciar (){
     clearInterval(intervalo); 
     intervalo = null; 
+
 }
 
+const cambiarImagen = (imagen) =>{
+    icono.setAttribute("src", imagen); 
+}
+
+function mostrarTiempo(){
+    const tiempo = new Date(segundos * 1000);
+    const tiempoFormateado = tiempo.toLocaleTimeString("es-MX", {minute:"2-digit", second:"2-digit"});  
+    tiempoEnPantalla.innerHTML = tiempoFormateado; 
+}
+
+mostrarTiempo();
